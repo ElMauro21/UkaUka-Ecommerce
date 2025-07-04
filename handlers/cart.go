@@ -103,3 +103,105 @@ func HandleAddToCart(c *gin.Context, db *sql.DB){
 	c.Redirect(http.StatusSeeOther,"/shop")
 }
 
+func HandleIncreaseQuantityCart(c *gin.Context, db *sql.DB) {
+	productID := c.PostForm("product-id")
+	prodID, err := strconv.Atoi(productID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "ID de producto inválido.")
+		return
+	}
+
+	cartID, err := cart.GetCartID(c, db)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "No se pudo obtener el carrito.")
+		return
+	}
+
+	var currentQty int
+	err = db.QueryRow(`
+		SELECT quantity FROM cart_items WHERE cart_id = ? AND product_id = ?
+	`, cartID, prodID).Scan(&currentQty)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Producto no encontrado en el carrito.")
+		return
+	}
+
+	var stock int
+	err = db.QueryRow(`SELECT quantity FROM products WHERE id = ?`, prodID).Scan(&stock)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al verificar el stock.")
+		return
+	}
+
+	if currentQty+1 > stock {
+		var price float64
+		var name, image string
+		err = db.QueryRow(`
+			SELECT p.price, p.name, p.image_url
+			FROM products p
+			WHERE p.id = ?
+		`, prodID).Scan(&price, &name, &image)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Error al obtener datos del producto.")
+			return
+		}
+
+		subtotal := float64(currentQty) * price
+
+		view.Render(c, http.StatusOK, "cart_item_partial.html", gin.H{
+			"ProductID":   prodID,
+			"Image":       image,
+			"Name":        name,
+			"Quantity":    currentQty,
+			"Stock":       stock,
+			"Price":       price,
+			"Subtotal":    subtotal,
+			"Message":     "No hay suficiente stock.",
+			"MessageType": "error",
+		})
+		return
+	}
+
+	_, err = db.Exec(`
+		UPDATE cart_items SET quantity = quantity + 1 WHERE cart_id = ? AND product_id = ?
+	`, cartID, prodID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "No se pudo actualizar la cantidad.")
+		return
+	}
+
+	var quantity int
+	var price float64
+	var name, image string
+	err = db.QueryRow(`
+		SELECT ci.quantity, p.price, p.name, p.image_url
+		FROM cart_items ci
+		JOIN products p ON p.id = ci.product_id
+		WHERE ci.cart_id = ? AND ci.product_id = ?
+	`, cartID, prodID).Scan(&quantity, &price, &name, &image)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al obtener datos actualizados.")
+		return
+	}
+
+	subtotal := float64(quantity) * price
+
+	// Get stock again in case it changed
+	err = db.QueryRow(`SELECT quantity FROM products WHERE id = ?`, prodID).Scan(&stock)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al verificar el stock.")
+		return
+	}
+
+	view.Render(c, http.StatusOK, "cart_item_partial.html", gin.H{
+		"ProductID":   prodID,
+		"Image":       image,
+		"Name":        name,
+		"Quantity":    quantity,
+		"Stock":       stock,
+		"Price":       price,
+		"Subtotal":    subtotal,
+		"Message":     "Cantidad aumentada",
+		"MessageType": "success",
+	})
+}

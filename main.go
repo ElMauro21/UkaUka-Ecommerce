@@ -112,6 +112,9 @@ func main() {
   r.POST("/cart/add",func (c *gin.Context){
     handlers.HandleAddToCart(c,db)
   })
+  r.POST("/cart/increase",func (c *gin.Context){
+    handlers.HandleIncreaseQuantityCart(c,db)
+  })
 
   r.Run() 
 }

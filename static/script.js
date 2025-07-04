@@ -145,6 +145,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+function applyPriceFormatting() {
+    document.querySelectorAll('.price').forEach(el => {
+        const raw = el.dataset.raw;
+        el.textContent = formatCOP(raw);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyPriceFormatting();
+});
+
+document.body.addEventListener('htmx:afterSwap', () => {
+    applyPriceFormatting();
+});
+
 // Modal product
 
 document.addEventListener('DOMContentLoaded', () => {
