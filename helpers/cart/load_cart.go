@@ -14,6 +14,7 @@ type CartItem struct{
     Quantity int
     Price float64
     Subtotal float64
+    Stock int
 }
 
 func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
@@ -32,7 +33,8 @@ func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
     products.image_url,
     products.name,
     cart_items.quantity,
-    products.price
+    products.price,
+    products.quantity
     FROM 
     cart_items
     JOIN
@@ -51,7 +53,7 @@ func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
 
     for rows.Next() {
         var item CartItem
-        err := rows.Scan(&item.ProductID, &item.Image, &item.Name, &item.Quantity, &item.Price)
+        err := rows.Scan(&item.ProductID, &item.Image, &item.Name, &item.Quantity, &item.Price, &item.Stock)
         if err != nil {
             continue
         }

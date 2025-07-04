@@ -20,7 +20,18 @@
         />
       </div>
       <div class="cart-item-name">{{ .Name }}</div>
-      <div class="cart-item-quantity">{{ .Quantity }}</div>
+      <div class="cart-item-quantity">
+        <div class="quantity-control">
+          <button type="button" class="qty-btn" id="qty-decrease">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <span id="qty-display">{{ .Quantity }}</span>
+          <button type="button" class="qty-btn" id="qty-increase">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <p>Stock disponible: <span>{{ .Stock }}</span></p>
+      </div>
       <div class="cart-item-price price">{{ .Price }}</div>
       <div class="cart-item-subtotal price">{{ .Subtotal }}</div>
     </div>
