@@ -248,3 +248,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Safari bug screen solution
+function setViewportHeight() {
+    let vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+
+setViewportHeight();
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(setViewportHeight, 0);
+});
