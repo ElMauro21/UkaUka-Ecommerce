@@ -18,6 +18,12 @@
     <div id="cart-total">
       <strong>Total:</strong>
       <span class="price" data-raw="{{ .Total }}">{{ .Total }}</span>
+      <button
+        class="checkout-button"
+        onclick="window.location.href='/checkout'"
+      >
+        Pagar
+      </button>
     </div>
     {{ end }}
   </div>

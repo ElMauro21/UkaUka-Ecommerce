@@ -119,5 +119,10 @@ func main() {
     handlers.HandleDecreaseQuantityCart(c,db)
   })
 
+  // Checkout
+  r.GET("/checkout", func (c *gin.Context){
+    handlers.HandleOpenCheckout(c)
+  })
+
   r.Run() 
 }
