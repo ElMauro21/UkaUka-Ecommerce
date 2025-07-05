@@ -17,14 +17,14 @@ type CartItem struct{
     Stock int
 }
 
-func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
+func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,float64,error){
     
     cartID , err := GetCartID(c,db)
     if err != nil {
         if errors.Is(err, sql.ErrNoRows) {
-		return []CartItem{}, nil
+		return []CartItem{}, 0, nil
 	}
-	    return nil, err
+	    return nil, 0, err
     }
 
     rows, err := db.Query(`
@@ -44,12 +44,13 @@ func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
     `,cartID)
 
     if err != nil {
-        return []CartItem{},err
+        return []CartItem{},0,err
 	}
 
     defer rows.Close()
 
     var items []CartItem
+    var total float64
 
     for rows.Next() {
         var item CartItem
@@ -58,8 +59,9 @@ func LoadCartItems(c *gin.Context, db *sql.DB) ([]CartItem,error){
             continue
         }
         item.Subtotal = item.Price * float64(item.Quantity)
+        total += item.Subtotal
         items = append(items, item)
     }
 
-    return items,nil
+    return items,total,nil
 }

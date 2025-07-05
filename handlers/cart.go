@@ -14,7 +14,7 @@ import (
 
 func HandleOpenCart(c *gin.Context, db *sql.DB){
 	
-	items,err := cart.LoadCartItems(c,db)
+	items,total,err := cart.LoadCartItems(c,db)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error al cargar el carrito: " + err.Error())
 		return
@@ -27,6 +27,7 @@ func HandleOpenCart(c *gin.Context, db *sql.DB){
 		"Message": msg,
 		"MessageType": msgType,
 		"items": items,
+		"Total": total,
 	})
 }
 
@@ -156,17 +157,23 @@ func HandleIncreaseQuantityCart(c *gin.Context, db *sql.DB) {
 		return
 	}
 
-	subtotal := float64(currentQty) * price
+	items, total, err := cart.LoadCartItems(c, db)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al actualizar carrito")
+		return
+	}
 
-	view.Render(c, http.StatusOK, "cart_item", gin.H{
-		"ProductID": prodID,
-		"Image":     image,
-		"Name":      name,
-		"Quantity":  currentQty,
-		"Stock":     stock,
-		"Price":     price,
-		"Subtotal":  subtotal,
+	updatedItem := cart.FindCartItemByID(items, prodID)
+	if updatedItem == nil {
+		c.String(http.StatusNotFound, "Producto no encontrado después de actualizar.")
+		return
+	}
+
+	view.Render(c, http.StatusOK, "cart_item_with_total.html", gin.H{
+		"Item":  updatedItem,
+		"Total": total,
 	})
+
 }
 
 func HandleDecreaseQuantityCart(c *gin.Context, db *sql.DB){
@@ -233,15 +240,20 @@ func HandleDecreaseQuantityCart(c *gin.Context, db *sql.DB){
 		return
 	}
 
-	subtotal := float64(currentQty) * price
+	items, total, err := cart.LoadCartItems(c, db)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al actualizar carrito")
+		return
+	}
 
-	view.Render(c, http.StatusOK, "cart_item", gin.H{
-		"ProductID": prodID,
-		"Image":     image,
-		"Name":      name,
-		"Quantity":  currentQty,
-		"Stock":     stock,
-		"Price":     price,
-		"Subtotal":  subtotal,
+	updatedItem := cart.FindCartItemByID(items, prodID)
+	if updatedItem == nil {
+		c.String(http.StatusNotFound, "Producto no encontrado después de actualizar.")
+		return
+	}
+
+	view.Render(c, http.StatusOK, "cart_item_with_total.html", gin.H{
+		"Item":  updatedItem,
+		"Total": total,
 	})
 }
