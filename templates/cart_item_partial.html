@@ -1,3 +1,4 @@
+{{ define "cart_item" }}
 <div class="cart-item" id="cart-item-{{ .ProductID }}">
   <input type="hidden" name="product-id" value="{{ .ProductID }}" />
   <div class="cart-item-img">
@@ -39,11 +40,4 @@
     {{ .Subtotal }}
   </div>
 </div>
-
-<!-- Flash message: OOB swap -->
-<div
-  id="flash"
-  data-message="{{ .Message }}"
-  data-type="{{ .MessageType }}"
-  hx-swap-oob="true"
-></div>
+{{ end }}
