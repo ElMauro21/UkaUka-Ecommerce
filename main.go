@@ -49,6 +49,7 @@ func main() {
   defer db.Close()
 
   jobs.JobTokenCleanup(db)
+  jobs.JobGuestCartCleanup(db)
 
   admin.CreateAdminUser(db)
 

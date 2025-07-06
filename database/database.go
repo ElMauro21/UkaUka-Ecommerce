@@ -13,6 +13,12 @@ db,err := sql.Open("sqlite3","./uka.db")
 if err != nil{
 	log.Fatalf("Error al abrir la base de datos: %v", err)
 }
+
+_, err = db.Exec("PRAGMA foreign_keys = ON;")
+if err != nil {
+	log.Fatalf("Error al habilitar claves foráneas: %v", err)
+}
+
 runMigration(db)
 return db
 }
@@ -52,6 +58,7 @@ CREATE TABLE IF NOT EXISTS carts (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
 user_id INTEGER,
 session_id TEXT,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY(user_id) REFERENCES users(id)
 );`)
 mustExec(db,`
@@ -60,7 +67,7 @@ id INTEGER PRIMARY KEY AUTOINCREMENT,
 cart_id INTEGER NOT NULL,
 product_id INTEGER NOT NULL,
 quantity INTEGER NOT NULL DEFAULT 1,
-FOREIGN KEY(cart_id) REFERENCES carts(id),
+FOREIGN KEY(cart_id) REFERENCES carts(id) ON DELETE CASCADE,
 FOREIGN KEY(product_id) REFERENCES products(id)
 );`)
 mustExec(db,`
