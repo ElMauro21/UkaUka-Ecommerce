@@ -20,6 +20,8 @@ func HandleOpenCart(c *gin.Context, db *sql.DB){
 		return
 	}
 
+	description := cart.BuildDescription(items)
+
 	msg,msgType := flash.GetMessage(c)
 
 	view.Render(c,http.StatusOK,"cart.html",gin.H{
@@ -28,6 +30,7 @@ func HandleOpenCart(c *gin.Context, db *sql.DB){
 		"MessageType": msgType,
 		"items": items,
 		"Total": total,
+		"Description": description,
 	})
 }
 
@@ -169,9 +172,12 @@ func HandleIncreaseQuantityCart(c *gin.Context, db *sql.DB) {
 		return
 	}
 
+	description := cart.BuildDescription(items)
+
 	view.Render(c, http.StatusOK, "cart_item_with_total.html", gin.H{
 		"Item":  updatedItem,
 		"Total": total,
+		"Description": description,
 	})
 
 }
@@ -252,8 +258,11 @@ func HandleDecreaseQuantityCart(c *gin.Context, db *sql.DB){
 		return
 	}
 
+	description := cart.BuildDescription(items)	
+
 	view.Render(c, http.StatusOK, "cart_item_with_total.html", gin.H{
 		"Item":  updatedItem,
 		"Total": total,
+		"Description": description,
 	})
 }

@@ -120,7 +120,7 @@ func main() {
   })
 
   // Checkout
-  r.GET("/checkout", func (c *gin.Context){
+  r.POST("/checkout", func (c *gin.Context){
     handlers.HandleOpenCheckout(c)
   })
 

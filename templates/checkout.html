@@ -3,7 +3,9 @@
   <h1 class="page-title checkout-title">Información de envío</h1>
   <div class="checkout-container">
     <div class="checkout-info-container">
-      <form>
+      <form method="post" action="/process-payment">
+        <input type="hidden" name="total" value="{{ .Total }}" />
+        <input type="hidden" name="description" value="{{ .Description }}" />
         <!--Name-->
         <div class="checkout-input">
           <label for="name">Nombres</label>
@@ -41,7 +43,7 @@
         </div>
         <!--Neighborhood-->
         <div class="checkout-input">
-          <label for="name">Barrio</label>
+          <label for="neighborhood">Barrio</label>
           <input name="neighborhood" type="text" required />
         </div>
         <!--Address-->
@@ -49,10 +51,10 @@
           <label for="address">Dirección</label>
           <input name="address" type="text" required />
         </div>
+        <div class="checkout-button-container">
+          <button>Pagar</button>
+        </div>
       </form>
-    </div>
-    <div class="checkout-button-container">
-      <button>Pagar</button>
     </div>
   </div>
 </main>

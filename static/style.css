@@ -672,7 +672,7 @@ header {
     color: var(--orange);
     background-color: white;
     border-radius: 0.5em;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 21px 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .modal-description {

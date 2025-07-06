@@ -16,14 +16,13 @@
     </div>
     {{ end }} {{ if .items }}
     <div id="cart-total">
-      <strong>Total:</strong>
-      <span class="price" data-raw="{{ .Total }}">{{ .Total }}</span>
-      <button
-        class="checkout-button"
-        onclick="window.location.href='/checkout'"
-      >
-        Pagar
-      </button>
+      <form action="/checkout" method="post">
+        <input type="hidden" name="total" value="{{ .Total }}" />
+        <input type="hidden" name="description" value="{{ .Description }}" />
+        <strong>Total:</strong>
+        <span class="price" data-raw="{{ .Total }}">{{ .Total }}</span>
+        <button class="checkout-button" type="submit">Pagar</button>
+      </form>
     </div>
     {{ end }}
   </div>
