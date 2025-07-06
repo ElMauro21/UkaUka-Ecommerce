@@ -9,47 +9,73 @@
         <!--Name-->
         <div class="checkout-input">
           <label for="name">Nombres</label>
-          <input label="Nombres" name="name" type="text" required />
+          <input
+            label="Nombres"
+            name="name"
+            type="text"
+            value="{{ .User.Names}}"
+            required
+          />
         </div>
         <!--Surname-->
         <div class="checkout-input">
           <label for="surname">Apellidos</label>
-          <input name="surname" type="text" required />
+          <input
+            name="surname"
+            type="text"
+            value="{{ .User.Surnames }}"
+            required
+          />
         </div>
         <!--Id-->
         <div class="checkout-input">
           <label for="id-number">Documento</label>
-          <input name="id-number" type="text" required />
+          <input
+            name="id-number"
+            type="text"
+            value="{{ .User.IDNumber }}"
+            required
+          />
         </div>
         <!--Phone-->
         <div class="checkout-input">
           <label for="phone">Teléfono</label>
-          <input name="phone" type="text" required />
+          <input name="phone" type="text" value="{{ .User.Phone }}" required />
         </div>
         <!--Mail-->
         <div class="checkout-input">
           <label for="mail">Correo electrónico</label>
-          <input name="mail" type="email" required />
+          <input name="mail" type="email" value="{{ .User.Mail }}" required />
         </div>
         <!--State-->
         <div class="checkout-input">
           <label for="state">Departamento</label>
-          <input name="state" type="text" required />
+          <input name="state" type="text" value="{{ .User.State }}" required />
         </div>
         <!--City-->
         <div class="checkout-input">
           <label for="city">Ciudad</label>
-          <input name="city" type="text" required />
+          <input name="city" type="text" value="{{ .User.City }}" required />
         </div>
         <!--Neighborhood-->
         <div class="checkout-input">
           <label for="neighborhood">Barrio</label>
-          <input name="neighborhood" type="text" required />
+          <input
+            name="neighborhood"
+            type="text"
+            value="{{ .User.Neighborhood }}"
+            required
+          />
         </div>
         <!--Address-->
         <div class="checkout-input">
           <label for="address">Dirección</label>
-          <input name="address" type="text" required />
+          <input
+            name="address"
+            type="text"
+            value="{{ .User.Address }}"
+            required
+          />
         </div>
         <div class="checkout-button-container">
           <button>Pagar</button>

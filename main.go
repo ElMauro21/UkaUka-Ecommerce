@@ -121,7 +121,7 @@ func main() {
 
   // Checkout
   r.POST("/checkout", func (c *gin.Context){
-    handlers.HandleOpenCheckout(c)
+    handlers.HandleOpenCheckout(c,db)
   })
 
   r.Run() 
