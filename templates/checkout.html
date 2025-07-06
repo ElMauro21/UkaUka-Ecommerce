@@ -1,6 +1,59 @@
 {{ template "base" .}}
 <main>
-  <h1 class="page-title">Información de envío</h1>
-  <div>This is the checkout</div>
+  <h1 class="page-title checkout-title">Información de envío</h1>
+  <div class="checkout-container">
+    <div class="checkout-info-container">
+      <form>
+        <!--Name-->
+        <div class="checkout-input">
+          <label for="name">Nombres</label>
+          <input label="Nombres" name="name" type="text" required />
+        </div>
+        <!--Surname-->
+        <div class="checkout-input">
+          <label for="surname">Apellidos</label>
+          <input name="surname" type="text" required />
+        </div>
+        <!--Id-->
+        <div class="checkout-input">
+          <label for="id-number">Documento</label>
+          <input name="id-number" type="text" required />
+        </div>
+        <!--Phone-->
+        <div class="checkout-input">
+          <label for="phone">Teléfono</label>
+          <input name="phone" type="text" required />
+        </div>
+        <!--Mail-->
+        <div class="checkout-input">
+          <label for="mail">Correo electrónico</label>
+          <input name="mail" type="email" required />
+        </div>
+        <!--State-->
+        <div class="checkout-input">
+          <label for="state">Departamento</label>
+          <input name="state" type="text" required />
+        </div>
+        <!--City-->
+        <div class="checkout-input">
+          <label for="city">Ciudad</label>
+          <input name="city" type="text" required />
+        </div>
+        <!--Neighborhood-->
+        <div class="checkout-input">
+          <label for="name">Barrio</label>
+          <input name="neighborhood" type="text" required />
+        </div>
+        <!--Address-->
+        <div class="checkout-input">
+          <label for="address">Dirección</label>
+          <input name="address" type="text" required />
+        </div>
+      </form>
+    </div>
+    <div class="checkout-button-container">
+      <button>Pagar</button>
+    </div>
+  </div>
 </main>
 {{ template "footer" .}}
