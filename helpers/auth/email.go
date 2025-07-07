@@ -31,7 +31,7 @@ func SendRecoveryEmail(c *gin.Context) error {
 	var(
 		smtpHost = "smtp.gmail.com"
 		smtpPort = "587"
-		smtpUsername = "mauro311095@gmail.com"
+		smtpUsername = "ukaukafb31@gmail.com"
 	)
 	
 	from := smtpUsername
