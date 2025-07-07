@@ -106,9 +106,27 @@
             </form>
           </div>
         </div>
-        <button class="header-nav-button">
-          <i class="fa-solid fa-bars"></i>
-        </button>
+        <!--Dropdown button-->
+        <div class="dropdown">
+          <button class="header-nav-button" id="menu-toggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="dropdown-content" id="dropdown-content">
+            <a href="/">Página de inicio</a>
+            <a href="/shop">Tienda</a>
+            <a href="/cart">Carrito de compras</a>
+            {{if .loggedIn}}
+            <form action="/auth/logout" method="post">
+              <button type="submit" class="logout-menu">
+                <a>Cierra sesión</a>
+              </button>
+            </form>
+            {{else}}
+            <a href="/auth/login">Inicia sesión</a>
+            {{end}}
+            <a href="/about">Acerca de UkaUka</a>
+          </div>
+        </div>
       </nav>
     </header>
     <!--Alerts-->

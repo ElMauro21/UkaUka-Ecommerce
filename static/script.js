@@ -49,22 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         recoverForm?.style && (recoverForm.style.display = 'none');
     };
 
-    if (toggleButton && subMenu) {
-        toggleButton.addEventListener('click', event => {
-            event.stopPropagation();
-            subMenu.classList.toggle('open-menu');
-        });
-
-        document.addEventListener('click', event => {
-            if (
-                !subMenu.contains(event.target) &&
-                !toggleButton.contains(event.target)
-            ) {
-                subMenu.classList.remove('open-menu');
-            }
-        });
-    }
-
     setupAdminProductForm();
 });
 
@@ -261,4 +245,45 @@ let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(setViewportHeight, 0);
+});
+
+// Menus
+
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleButton = document.getElementById('toggleMenuBtn');
+    const subMenu = document.getElementById('subMenu');
+    const dropdownToggle = document.getElementById('menu-toggle');
+    const dropdownContent = document.getElementById('dropdown-content');
+    const dropdown = document.querySelector('.dropdown');
+
+    // ----- Submenu toggle -----
+    if (toggleButton && subMenu) {
+        toggleButton.addEventListener('click', event => {
+            event.stopPropagation();
+            subMenu.classList.toggle('open-menu');
+            dropdownContent?.classList.remove('open-dropdown');
+        });
+    }
+
+    // ----- Dropdown toggle -----
+    if (dropdownToggle && dropdownContent) {
+        dropdownToggle.addEventListener('click', event => {
+            event.stopPropagation();
+            dropdownContent.classList.toggle('open-dropdown');
+            subMenu?.classList.remove('open-menu');
+        });
+    }
+
+    document.addEventListener('click', event => {
+        if (!dropdown?.contains(event.target)) {
+            dropdownContent?.classList.remove('open-dropdown');
+        }
+
+        if (
+            !subMenu?.contains(event.target) &&
+            !toggleButton?.contains(event.target)
+        ) {
+            subMenu?.classList.remove('open-menu');
+        }
+    });
 });
