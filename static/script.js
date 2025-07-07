@@ -287,3 +287,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+// Terms and conditions
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modalWrapper = document.getElementById('modal-wrapper-terms');
+    const modalOverlay = document.querySelector('.modal-overlay-terms');
+    const openModalLink = document.getElementById('open-modal-link');
+    const closeModalBtn = document.getElementById('close-modal-terms'); // or close-modal-terms
+
+    if (openModalLink && modalWrapper) {
+        openModalLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            modalWrapper.style.display = 'flex';
+        });
+    }
+
+    if (closeModalBtn && modalWrapper) {
+        closeModalBtn.addEventListener('click', function () {
+            modalWrapper.style.display = 'none';
+        });
+    }
+
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function (event) {
+            if (event.target === modalOverlay) {
+                modalWrapper.style.display = 'none';
+            }
+        });
+    }
+});
