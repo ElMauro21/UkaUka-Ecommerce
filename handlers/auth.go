@@ -31,18 +31,38 @@ func HandleLogin(c *gin.Context, db *sql.DB){
 
 	var storedHash string
 	var isAdmin int
+	var failedAttempts int
+	var lockedUntil sql.NullTime
 
-	err := db.QueryRow("SELECT password_hash, is_admin FROM users WHERE email = ?", email).Scan(&storedHash, &isAdmin)
+	err := db.QueryRow(`SELECT password_hash, is_admin, failed_attempts, locked_until 
+	FROM users 
+	WHERE email = ?`, email).Scan(&storedHash, &isAdmin, &failedAttempts, &lockedUntil)
 	if err != nil {
 		view.RenderFlash(c,http.StatusOK,"Contraseña o usuario incorrectos","error")
+		return
+	}
+
+	if lockedUntil.Valid && time.Now().Before(lockedUntil.Time){
+		view.RenderFlash(c, http.StatusOK, "Cuenta bloqueada. Inténtalo más tarde.", "error")
 		return
 	}
 
 	err = auth.ComparePasswords(storedHash,password)
 	if err != nil {
-		view.RenderFlash(c,http.StatusOK,"Contraseña o usuario incorrectos","error")
+		failedAttempts ++
+		if failedAttempts >= 5 {
+			lockDuration := 15 * time.Minute
+			_, _ = db.Exec("UPDATE users SET failed_attempts = ?, locked_until = ? WHERE email = ?",
+				failedAttempts, time.Now().Add(lockDuration), email)
+			view.RenderFlash(c, http.StatusOK, "Demasiados intentos fallidos. Cuenta bloqueada por 15 minutos.", "error")
+		} else {
+			_, _ = db.Exec("UPDATE users SET failed_attempts = ? WHERE email = ?", failedAttempts, email)
+			view.RenderFlash(c, http.StatusOK, "Contraseña o usuario incorrectos", "error")
+		}
 		return
 	}
+
+	_, _ = db.Exec("UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE email = ?", email)
 
 	session := sessions.Default(c)
 	session.Set("user", email)

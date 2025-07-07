@@ -39,7 +39,9 @@ city TEXT,
 neighborhood TEXT,
 address TEXT,
 password_hash TEXT NOT NULL,
-is_admin INTEGER NOT NULL DEFAULT 0
+is_admin INTEGER NOT NULL DEFAULT 0,
+failed_attempts INTEGER NOT NULL DEFAULT 0,
+locked_until DATETIME
 );`)
 mustExec(db,`
 CREATE TABLE IF NOT EXISTS products (
