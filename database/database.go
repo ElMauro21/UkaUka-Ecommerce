@@ -79,6 +79,18 @@ email TEXT NOT NULL,
 token TEXT NOT NULL,
 expires_at DATETIME NOT NULL
 );`)
+mustExec(db,`
+CREATE TABLE IF NOT EXISTS transactions (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER,
+reference_code TEXT UNIQUE NOT NULL,
+total_amount FLOAT NOT NULL,
+status TEXT NOT NULL DEFAULT 'pending',
+shipped INTEGER NOT NULL DEFAULT 0,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY(user_id) REFERENCES users(id)
+);
+`)
 }
 
 // helper: panic if migration fails
