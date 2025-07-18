@@ -91,6 +91,21 @@ created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 FOREIGN KEY(user_id) REFERENCES users(id)
 );
 `)
+mustExec(db,`
+CREATE TABLE IF NOT EXISTS shipping_info (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+transaction_id INTEGER NOT NULL,
+full_name TEXT NOT NULL,
+id_number TEXT NOT NULL,
+phone TEXT NOT NULL,
+email TEXT NOT NULL,
+state TEXT NOT NULL,
+city TEXT NOT NULL,
+neighborhood TEXT NOT NULL,
+address TEXT NOT NULL,
+created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+FOREIGN KEY(transaction_id) REFERENCES transactions(id)
+);`)
 }
 
 // helper: panic if migration fails

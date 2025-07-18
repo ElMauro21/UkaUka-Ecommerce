@@ -124,6 +124,9 @@ func main() {
   r.POST("/checkout", func (c *gin.Context){
     handlers.HandleOpenCheckout(c,db)
   })
+  r.POST("/process-payment", func (c *gin.Context){
+    handlers.HandleProcessPayment(c,db)
+  })
 
   r.Run() 
 }

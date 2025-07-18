@@ -2,11 +2,18 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
+	"os"
+	"strconv"
 
+	"github.com/ElMauro21/UkaUkafb/helpers/auth"
 	"github.com/ElMauro21/UkaUkafb/helpers/flash"
+	"github.com/ElMauro21/UkaUkafb/helpers/payu"
 	"github.com/ElMauro21/UkaUkafb/helpers/users"
 	"github.com/ElMauro21/UkaUkafb/helpers/view"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,5 +33,74 @@ func HandleOpenCheckout(c *gin.Context, db *sql.DB){
 		"MessageType": msgType,
 		"Total":       total,
 		"Description": description,
+	})
+}
+
+func HandleProcessPayment(c *gin.Context, db *sql.DB){
+	fullName := c.PostForm("name") + " " + c.PostForm("surname")
+	idNumber := c.PostForm("id-number")
+	phone := c.PostForm("phone")
+	email := c.PostForm("mail")
+	state := c.PostForm("state")
+	city := c.PostForm("city")
+	neighborhood := c.PostForm("neighborhood")
+	address := c.PostForm("address")
+
+	totalStr := c.PostForm("total")
+	totalAmount, err := strconv.ParseFloat(totalStr,64)
+	if err != nil {
+    	c.String(http.StatusBadRequest, "Monto total inválido")
+    	return
+	}
+
+var userID *int
+emailSession := sessions.Default(c).Get("user")
+
+if emailSession != nil {
+    id, err := auth.GetUserId(c, db)
+    if err != nil {
+        c.String(http.StatusInternalServerError, "Error obteniendo usuario")
+        return
+    }
+    userID = &id
+}
+
+	refCode, err := payu.CreateTransaction(db,userID,totalAmount)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al crear transacción")
+		return
+	}
+
+	var transactionID int
+	err = db.QueryRow(`SELECT id FROM transactions WHERE reference_code = ?`, refCode).Scan(&transactionID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al obtener ID de la transacción")
+		return
+	}
+
+	err = payu.SaveShippingInfo(db,
+	fullName,idNumber,phone,email,state,city,neighborhood,address,transactionID)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al guardar información de envío")
+		return
+	}
+
+	apiKey := os.Getenv("API_KEY")
+  	if apiKey == ""{
+    	log.Fatal("API_KEY is not set")
+  	}
+
+	merchantId := os.Getenv("MERCHANT_ID")
+  	if merchantId == ""{
+    	log.Fatal("MERCHANT_ID is not set")
+  	}
+
+	signature := payu.GenerateSignature(apiKey,merchantId,refCode,fmt.Sprintf("%.2f",totalAmount),"COP")
+
+	c.HTML(http.StatusOK, "payu_form.html", gin.H{
+		"ReferenceCode": refCode,
+		"Amount": fmt.Sprintf("%.2f", totalAmount),
+		"Signature": signature,
+		"BuyerEmail": email,
 	})
 }

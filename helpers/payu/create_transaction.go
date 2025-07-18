@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func CreateTransaction(db *sql.DB, userID int, totalAmount float64) (string,error) {
+func CreateTransaction(db *sql.DB, userID *int, totalAmount float64) (string,error) {
 	now := time.Now()
 	yearMonth := now.Format("200601")
 
