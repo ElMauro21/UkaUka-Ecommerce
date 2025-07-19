@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/ElMauro21/UkaUkafb/helpers/auth"
+	"github.com/ElMauro21/UkaUkafb/helpers/cart"
 	"github.com/ElMauro21/UkaUkafb/helpers/flash"
 	"github.com/ElMauro21/UkaUkafb/helpers/payu"
 	"github.com/ElMauro21/UkaUkafb/helpers/users"
@@ -101,6 +102,18 @@ if emailSession != nil {
 		log.Fatal("ACCOUNT_ID is not set")
 	}
 	
+	cartItems,_,err := cart.LoadCartItems(c,db)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al cargar el carrito")
+		return
+	}
+
+	err = payu.SaveTransactionItems(db,transactionID,cartItems)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Error al guardar los ítems de la transacción")
+	return
+}
+
 	signature := payu.GenerateSignature(apiKey,merchantId,refCode,fmt.Sprintf("%.2f",totalAmount),"COP")
 
 	c.HTML(http.StatusOK, "payu_form.html", gin.H{
