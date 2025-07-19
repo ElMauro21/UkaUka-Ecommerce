@@ -45,6 +45,7 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
 	city := c.PostForm("city")
 	neighborhood := c.PostForm("neighborhood")
 	address := c.PostForm("address")
+	description := c.PostForm("description")
 
 	totalStr := c.PostForm("total")
 	totalAmount, err := strconv.ParseFloat(totalStr,64)
@@ -95,12 +96,33 @@ if emailSession != nil {
     	log.Fatal("MERCHANT_ID is not set")
   	}
 
+	accountId := os.Getenv("ACCOUNT_ID")
+	if accountId == ""{
+		log.Fatal("ACCOUNT_ID is not set")
+	}
+	
 	signature := payu.GenerateSignature(apiKey,merchantId,refCode,fmt.Sprintf("%.2f",totalAmount),"COP")
 
 	c.HTML(http.StatusOK, "payu_form.html", gin.H{
-		"ReferenceCode": refCode,
-		"Amount": fmt.Sprintf("%.2f", totalAmount),
-		"Signature": signature,
-		"BuyerEmail": email,
+		"MerchantID":         merchantId,
+  		"AccountID":          accountId,
+  		"Description":        description,
+  		"ReferenceCode":      refCode,
+  		"Amount":             fmt.Sprintf("%.2f", totalAmount),
+  		"Tax":                "0",
+  		"TaxReturnBase":      "0",
+  		"Currency":           "COP",
+  		"Signature":          signature,
+  		"Test":               "1",
+  		"BuyerEmail":         email,
+  		"BuyerFullName":      fullName,
+  		"BuyerDocumentType":  "CC",
+  		"BuyerDocument":      idNumber,
+  		"Telephone":          phone,
+  		"ShippingAddress":    address,
+  		"ShippingCity":       city,
+  		"ShippingCountry":    "CO",
+  		"ResponseURL":        "https://aa2078dc6792.ngrok-free.app/payu/response",
+  		"ConfirmationURL":    "https://aa2078dc6792.ngrok-free.app/payu/confirmation",
 	})
 }

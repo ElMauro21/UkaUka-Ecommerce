@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/ElMauro21/UkaUkafb/database"
@@ -127,6 +128,13 @@ func main() {
   r.POST("/process-payment", func (c *gin.Context){
     handlers.HandleProcessPayment(c,db)
   })
+  r.GET("/payu/confirmation", func(c *gin.Context) {
+	c.String(http.StatusOK, "Ruta activa (GET)")
+  })
+  r.POST("/payu/confirmation", func(c *gin.Context) {
+	  c.String(http.StatusOK, "OK")
+  })
+
 
   r.Run() 
 }
