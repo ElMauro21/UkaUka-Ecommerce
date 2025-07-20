@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/ElMauro21/UkaUkafb/database"
@@ -132,9 +131,7 @@ func main() {
 	  handlers.HandlePayUConfirmation(c,db)
   })
   r.GET("/payu/response", func(c *gin.Context) {
-	c.HTML(http.StatusOK, "success.html", gin.H{
-		"Message": "¡Gracias por tu compra! Tu pago fue aprobado.",
-	  })
+    handlers.HandleOpenSuccess(c)
   })
 
   r.Run() 

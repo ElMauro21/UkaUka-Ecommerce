@@ -14,13 +14,15 @@ func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
 
 	var transactionID int
 	var status string
+	var userID sql.NullInt64
+	var sessionID sql.NullString
+
 	err = tx.QueryRow(`
-		SELECT id, status FROM transactions WHERE reference_code = ?`, refCode).
-		Scan(&transactionID, &status)
+		SELECT id, status, user_id, session_id FROM transactions WHERE reference_code = ?`, refCode).
+		Scan(&transactionID, &status, &userID, &sessionID)
 	if err != nil {
 		return err
 	}
-
 	if status != "pending" {
 		return fmt.Errorf("transaction already processed")
 	}
@@ -38,19 +40,11 @@ func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
 			return err
 		}
 
-		res, err := tx.Exec(`
+		_, err = tx.Exec(`
 			UPDATE products SET quantity = quantity - ?
 			WHERE id = ? AND quantity >= ?`, quantity, productID, quantity)
 		if err != nil {
 			return err
-		}
-
-		affected, err := res.RowsAffected()
-		if err != nil {
-			return err
-		}
-		if affected == 0 {
-			return fmt.Errorf("not enough stock for product %d", productID)
 		}
 	}
 
@@ -60,33 +54,14 @@ func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
 		return err
 	}
 
-	var userID sql.NullInt64
-	var sessionID sql.NullString
-
-	err = tx.QueryRow(`SELECT user_id, session_id FROM transactions WHERE id = ?`, transactionID).
-		Scan(&userID, &sessionID)
-	if err != nil {
-		return err
+	if userID.Valid {
+		_, err = tx.Exec(`DELETE FROM carts WHERE user_id = ?`, userID.Int64)
+	} else if sessionID.Valid {
+		_, err = tx.Exec(`DELETE FROM carts WHERE session_id = ?`, sessionID.String)
 	}
 
-	if userID.Valid {
-		_, err = tx.Exec(`
-			DELETE FROM cart_items
-			WHERE cart_id IN (
-				SELECT id FROM carts WHERE user_id = ?
-			)`, userID.Int64)
-		if err != nil {
-			return err
-		}
-	} else if sessionID.Valid {
-		_, err = tx.Exec(`
-			DELETE FROM cart_items
-			WHERE cart_id IN (
-				SELECT id FROM carts WHERE session_id = ?
-			)`, sessionID.String)
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return fmt.Errorf("error deleting cart: %v", err)
 	}
 
 	return tx.Commit()

@@ -55,19 +55,25 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
     	return
 	}
 
-var userID *int
-emailSession := sessions.Default(c).Get("user")
+	var userID *int
+	var sessionID *string
+	emailSession := sessions.Default(c).Get("user")
 
-if emailSession != nil {
-    id, err := auth.GetUserId(c, db)
-    if err != nil {
-        c.String(http.StatusInternalServerError, "Error obteniendo usuario")
-        return
-    }
-    userID = &id
-}
+	if emailSession != nil {
+    	id, err := auth.GetUserId(c, db)
+    	if err != nil {
+        	c.String(http.StatusInternalServerError, "Error obteniendo usuario")
+        	return
+    	}
+    	userID = &id
+	}else {
+		s := sessions.Default(c).Get("cart_session_id")
+    	if sStr, ok := s.(string); ok {
+        	sessionID = &sStr
+    	}
+	}
 
-	refCode, err := payu.CreateTransaction(db,userID,totalAmount)
+	refCode, err := payu.CreateTransaction(db,userID, sessionID,totalAmount)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error al crear transacción")
 		return
@@ -157,4 +163,20 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 	}
 	
 	c.String(http.StatusOK, "OK")
+}
+
+func HandleOpenSuccess(c *gin.Context){
+	
+	session := sessions.Default(c)
+	session.Delete("cart_session_id")
+	session.Save()
+
+	flash.SetMessage(c,"¡Gracias por tu compra! Tu pago fue aprobado.","success")
+	msg,msgType := flash.GetMessage(c)
+
+	view.Render(c,http.StatusOK,"success.html",gin.H{
+		"title": "Pago exitoso",
+		"Message": msg,
+		"MessageType": msgType,
+	})
 }
