@@ -128,13 +128,14 @@ func main() {
   r.POST("/process-payment", func (c *gin.Context){
     handlers.HandleProcessPayment(c,db)
   })
-  r.GET("/payu/confirmation", func(c *gin.Context) {
-	c.String(http.StatusOK, "Ruta activa (GET)")
-  })
   r.POST("/payu/confirmation", func(c *gin.Context) {
-	  c.String(http.StatusOK, "OK")
+	  handlers.HandlePayUConfirmation(c,db)
   })
-
+  r.GET("/payu/response", func(c *gin.Context) {
+	c.HTML(http.StatusOK, "success.html", gin.H{
+		"Message": "¡Gracias por tu compra! Tu pago fue aprobado.",
+	  })
+  })
 
   r.Run() 
 }

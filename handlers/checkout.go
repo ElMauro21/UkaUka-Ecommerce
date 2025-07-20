@@ -135,7 +135,26 @@ if emailSession != nil {
   		"ShippingAddress":    address,
   		"ShippingCity":       city,
   		"ShippingCountry":    "CO",
-  		"ResponseURL":        "https://aa2078dc6792.ngrok-free.app/payu/response",
-  		"ConfirmationURL":    "https://aa2078dc6792.ngrok-free.app/payu/confirmation",
+  		"ResponseURL":        "https://6d807902255a.ngrok-free.app/payu/response",
+  		"ConfirmationURL":    "https://6d807902255a.ngrok-free.app/payu/confirmation",
 	})
+}
+
+func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
+	referenceCode := c.PostForm("reference_sale")
+	state := c.PostForm("state_pol") // should be "4" for approved
+
+	if referenceCode == "" || state != "4" {
+		c.String(http.StatusBadRequest, "Invalid or non-approved transaction")
+		return
+	}
+	
+	err := payu.ProcessSuccessfulTransaction(db, referenceCode)
+	if err != nil {
+		log.Printf("Error processing transaction %s: %v", referenceCode, err)
+		c.String(http.StatusInternalServerError, "Error")
+		return
+	}
+	
+	c.String(http.StatusOK, "OK")
 }
