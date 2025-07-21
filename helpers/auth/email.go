@@ -95,7 +95,7 @@ func SendRefundEmail(toEmail string, fullName string, productSummary string) err
 					<p>Lamentamos informarte que uno o más productos de tu pedido están agotados:</p>
 					<p><strong>%s</strong></p>
 					<p>Como resultado, hemos iniciado un <strong>reembolso automático</strong> del valor correspondiente a tu método de pago.</p>
-					<p>Gracias por tu comprensión. Si tienes dudas, contáctanos a soporte@ukaukafb.com.</p>
+					<p>Gracias por tu comprensión. Si tienes dudas, contáctanos a ukaukafb31@gmail.com.</p>
 					<p style="margin-top:30px;">— El equipo de <strong>UkaUka</strong></p>
 				</div>
 			</body>

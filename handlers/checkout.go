@@ -202,18 +202,29 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 
 func HandleOpenSuccess(c *gin.Context){
 	
+	transactionState := c.Query("transactionState")
+	referenceCode := c.Query("referenceCode")
+
+	if transactionState != "4" {
+		
+		view.Render(c, http.StatusOK, "payment_failed.html", gin.H{
+			"title":        "Pago fallido",
+			"Message":      "Tu pago fue rechazado o cancelado.",
+			"MessageType":  "error",
+			"ReferenceCode": referenceCode,
+		})
+		return
+	}
+
 	session := sessions.Default(c)
 	if session.Get("user") == nil {
 		session.Delete("cart_session_id")
 		session.Save()
 	}
 
-	flash.SetMessage(c,"¡Gracias por tu compra! Tu pago fue aprobado.","success")
-	msg,msgType := flash.GetMessage(c)
-
 	view.Render(c,http.StatusOK,"success.html",gin.H{
 		"title": "Pago exitoso",
-		"Message": msg,
-		"MessageType": msgType,
+		"Message": "¡Gracias por tu compra! Tu pago fue aprobado.",
+		"MessageType": "success",
 	})
 }
