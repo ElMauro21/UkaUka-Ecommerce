@@ -119,6 +119,17 @@ CREATE TABLE IF NOT EXISTS transaction_items (
 	FOREIGN KEY(product_id) REFERENCES products(id)
 );
 `)
+mustExec(db, `
+CREATE TABLE IF NOT EXISTS refund_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transaction_id INTEGER NOT NULL,
+    payu_transaction_id TEXT NOT NULL,
+    status TEXT NOT NULL, -- e.g., 'success', 'fail'
+    message TEXT,
+    attempted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(transaction_id) REFERENCES transactions(id)
+);
+`)
 }
 
 // helper: panic if migration fails
