@@ -114,6 +114,22 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
 		return
 	}
 
+	// Validar stock antes de continuar
+	for _, item := range cartItems {
+		var stock int
+		err := db.QueryRow("SELECT quantity FROM products WHERE id = ?", item.ProductID).Scan(&stock)
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Error verificando stock")
+			return
+		}
+		if item.Quantity > stock {
+			flash.SetMessage(c, "El producto '"+item.Name+"' no tiene suficiente stock.", "error")
+			c.Redirect(http.StatusSeeOther, "/cart")
+			return
+		}
+	}
+
+
 	err = payu.SaveTransactionItems(db,transactionID,cartItems)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error al guardar los ítems de la transacción")
@@ -129,7 +145,6 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
     	testFlag = "0"
 		payuFormURL = "https://checkout.payulatam.com/ppp-web-gateway-payu/"
 	}
-
 
 	c.HTML(http.StatusOK, "payu_form.html", gin.H{
 		"MerchantID":         merchantId,
@@ -188,8 +203,10 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 func HandleOpenSuccess(c *gin.Context){
 	
 	session := sessions.Default(c)
-	session.Delete("cart_session_id")
-	session.Save()
+	if session.Get("user") == nil {
+		session.Delete("cart_session_id")
+		session.Save()
+	}
 
 	flash.SetMessage(c,"¡Gracias por tu compra! Tu pago fue aprobado.","success")
 	msg,msgType := flash.GetMessage(c)
