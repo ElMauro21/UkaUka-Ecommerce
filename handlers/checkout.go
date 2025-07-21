@@ -122,6 +122,15 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
 
 	signature := payu.GenerateSignature(apiKey,merchantId,refCode,fmt.Sprintf("%.2f",totalAmount),"COP")
 
+	payuEnv := os.Getenv("PAYU_ENV")
+	testFlag := "1" // default to sandbox
+	payuFormURL := "https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/"
+	if payuEnv == "production" {
+    	testFlag = "0"
+		payuFormURL = "https://checkout.payulatam.com/ppp-web-gateway-payu/"
+	}
+
+
 	c.HTML(http.StatusOK, "payu_form.html", gin.H{
 		"MerchantID":         merchantId,
   		"AccountID":          accountId,
@@ -132,7 +141,8 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
   		"TaxReturnBase":      "0",
   		"Currency":           "COP",
   		"Signature":          signature,
-  		"Test":               "1",
+  		"Test":               testFlag,
+		"PayUFormURL":        payuFormURL,
   		"BuyerEmail":         email,
   		"BuyerFullName":      fullName,
   		"BuyerDocumentType":  "CC",
@@ -165,7 +175,7 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
     	log.Printf("Error saving PayU transaction ID: %v", err)
 	}
 	
-	err = payu.ProcessSuccessfulTransaction(db, referenceCode)
+	err = payu.ProcessSuccessfulTransaction(db, referenceCode,transactionIDPayU)
 	if err != nil {
 		log.Printf("Error processing transaction %s: %v", referenceCode, err)
 		c.String(http.StatusInternalServerError, "Error")

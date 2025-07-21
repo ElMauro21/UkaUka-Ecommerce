@@ -7,10 +7,7 @@
   </head>
   <body onload="document.forms[0].submit()">
     <h3>Redirigiendo a la pasarela de pago...</h3>
-    <form
-      method="post"
-      action="https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/"
-    >
+    <form method="post" action="{{.PayUFormURL}}">
       <!-- Datos del comercio -->
       <input type="hidden" name="merchantId" value="{{ .MerchantID }}" />
       <input type="hidden" name="accountId" value="{{ .AccountID }}" />

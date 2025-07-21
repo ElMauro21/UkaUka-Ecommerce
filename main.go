@@ -22,6 +22,14 @@ func main() {
     log.Println("No .env file found")
   }
 
+  payuEnv := os.Getenv("PAYU_ENV")
+
+	if payuEnv == "production" {
+		log.Println("🚀 Running in PRODUCTION mode! Transactions are REAL.")
+	} else {
+		log.Println("🧪 Running in SANDBOX mode. No real charges.")
+	}
+
   secret := os.Getenv("SESSION_SECRET")
   if secret == ""{
     log.Fatal("SESSION_SECRET is not set")

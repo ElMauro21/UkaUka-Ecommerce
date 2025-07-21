@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
+func ProcessSuccessfulTransaction(db *sql.DB, refCode, payuTransactionID string) error {
 	tx, err := db.Begin()
 	if err != nil {
 		return err
@@ -52,6 +52,14 @@ func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
     		return err
 		}
 		if affected == 0 {
+			go func() {
+    			err := RefundTransaction(payuTransactionID) 
+    			if err != nil {
+      		  		fmt.Printf("⚠️ Refund failed: %v\n", err)
+    			} else {
+        			fmt.Println("✅ Refund triggered successfully")
+    			}
+			}()
    		 	_, updateErr := tx.Exec(`
         	UPDATE transactions SET status = 'needs_refund' WHERE id = ?`, transactionID)
     		if updateErr != nil {
