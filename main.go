@@ -139,7 +139,7 @@ func main() {
 	  handlers.HandlePayUConfirmation(c,db)
   })
   r.GET("/payu/response", func(c *gin.Context) {
-    handlers.HandleOpenSuccess(c)
+    handlers.HandleOpenSuccess(c,db)
   })
 
   r.Run() 

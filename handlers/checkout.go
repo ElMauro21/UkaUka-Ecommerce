@@ -200,31 +200,47 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 	c.String(http.StatusOK, "OK")
 }
 
-func HandleOpenSuccess(c *gin.Context){
-	
-	transactionState := c.Query("transactionState")
+func HandleOpenSuccess(c *gin.Context, db *sql.DB) {
 	referenceCode := c.Query("referenceCode")
 
-	if transactionState != "4" {
-		
-		view.Render(c, http.StatusOK, "payment_failed.html", gin.H{
-			"title":        "Pago fallido",
-			"Message":      "Tu pago fue rechazado o cancelado.",
-			"MessageType":  "error",
-			"ReferenceCode": referenceCode,
+	if referenceCode == "" {
+		view.Render(c, http.StatusBadRequest, "payment_failed.html", gin.H{
+			"title": "Transacción inválida",
+			"Message": "No se pudo verificar la transacción.",
 		})
 		return
 	}
 
-	session := sessions.Default(c)
-	if session.Get("user") == nil {
-		session.Delete("cart_session_id")
-		session.Save()
+	var status string
+	err := db.QueryRow("SELECT status FROM transactions WHERE reference_code = ?", referenceCode).Scan(&status)
+	if err != nil {
+		view.Render(c, http.StatusInternalServerError, "payment_failed.html", gin.H{
+			"title": "Error",
+			"Message": "No se pudo validar el estado de tu transacción.",
+		})
+		return
 	}
 
-	view.Render(c,http.StatusOK,"success.html",gin.H{
-		"title": "Pago exitoso",
-		"Message": "¡Gracias por tu compra! Tu pago fue aprobado.",
-		"MessageType": "success",
-	})
+	switch status {
+	case "completed":
+		session := sessions.Default(c)
+		session.Delete("cart_session_id")
+		session.Save()
+		flash.SetMessage(c, "¡Gracias por tu compra! Tu pago fue aprobado.", "success")
+		view.Render(c, http.StatusOK, "success.html", gin.H{
+			"title": "Pago exitoso",
+		})
+
+	case "needs_refund":
+		view.Render(c, http.StatusOK, "refund_pending.html", gin.H{
+			"title": "Reembolso en proceso",
+			"Message": "Tu pago fue recibido, pero el producto ya no está disponible. Hemos iniciado un reembolso automático. Te llegará un correo.",
+		})
+
+	default:
+		view.Render(c, http.StatusOK, "payment_failed.html", gin.H{
+			"title": "Pago no exitoso",
+			"Message": "Tu pago no fue aprobado o ocurrió un problema. Intenta de nuevo.",
+		})
+	}
 }
