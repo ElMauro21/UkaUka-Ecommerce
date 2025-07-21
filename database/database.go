@@ -89,6 +89,7 @@ status TEXT NOT NULL DEFAULT 'pending',
 shipped INTEGER NOT NULL DEFAULT 0,
 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 session_id TEXT,
+payu_transaction_id TEXT,
 FOREIGN KEY(user_id) REFERENCES users(id)
 );
 `)

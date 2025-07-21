@@ -40,11 +40,26 @@ func ProcessSuccessfulTransaction(db *sql.DB, refCode string) error {
 			return err
 		}
 
-		_, err = tx.Exec(`
-			UPDATE products SET quantity = quantity - ?
-			WHERE id = ? AND quantity >= ?`, quantity, productID, quantity)
+		res, err := tx.Exec(`
+    	UPDATE products SET quantity = quantity - ?
+    	WHERE id = ? AND quantity >= ?`, quantity, productID, quantity)
 		if err != nil {
-			return err
+    		return err
+		}
+
+		affected, err := res.RowsAffected()
+		if err != nil {
+    		return err
+		}
+		if affected == 0 {
+   		 	_, updateErr := tx.Exec(`
+        	UPDATE transactions SET status = 'needs_refund' WHERE id = ?`, transactionID)
+    		if updateErr != nil {
+        		return fmt.Errorf("stock issue and failed to mark for refund: %v", updateErr)
+    		}
+
+
+    	return tx.Commit()
 		}
 	}
 

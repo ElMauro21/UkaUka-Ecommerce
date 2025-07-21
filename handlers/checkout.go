@@ -154,8 +154,18 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 		c.String(http.StatusBadRequest, "Invalid or non-approved transaction")
 		return
 	}
+
+	transactionIDPayU := c.PostForm("transaction_id")
+	if transactionIDPayU == "" {
+    	transactionIDPayU = c.PostForm("transactionId")
+	}
+
+	_, err := db.Exec(`UPDATE transactions SET payu_transaction_id = ? WHERE reference_code = ?`, transactionIDPayU, referenceCode)
+	if err != nil {
+    	log.Printf("Error saving PayU transaction ID: %v", err)
+	}
 	
-	err := payu.ProcessSuccessfulTransaction(db, referenceCode)
+	err = payu.ProcessSuccessfulTransaction(db, referenceCode)
 	if err != nil {
 		log.Printf("Error processing transaction %s: %v", referenceCode, err)
 		c.String(http.StatusInternalServerError, "Error")
