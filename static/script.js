@@ -317,3 +317,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+function soundActivator() {
+    const video = document.getElementById('videoStopMotion');
+    video.muted = false;
+    video.play();
+}

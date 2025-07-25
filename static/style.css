@@ -1122,6 +1122,41 @@ a {
     color: var(--main-color);
 }
 
+/* Index */
+
+.index-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.index-content video {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.btn-sonido {
+    position: absolute;
+    border-radius: 5px;
+    top: 20px;
+    left: 20px;
+    z-index: 10;
+    padding: 10px 20px;
+    background: var(--main-color);
+    color: var(--contrast-color);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn-sonido:hover {
+    background-color: var(--button-hover);
+}
+
+.container-video {
+    position: relative;
+}
+
 /* Responsive */
 
 @media only screen and (max-width: 540px) {
