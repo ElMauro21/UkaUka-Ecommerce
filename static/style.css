@@ -1125,17 +1125,19 @@ a {
 /* Index */
 
 .index-content {
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 .index-content video {
     width: 100%;
-    height: auto;
+    height: 100%;
     display: block;
 }
 
-.btn-sonido {
+.btn-sound {
     position: absolute;
     border-radius: 5px;
     top: 20px;
@@ -1149,8 +1151,31 @@ a {
     font-size: 16px;
 }
 
-.btn-sonido:hover {
+.btn-sound:hover {
     background-color: var(--button-hover);
+}
+
+.btn-store {
+    position: absolute;
+    border-radius: 5px;
+    top: 20px;
+    left: 50%;
+    z-index: 10;
+    padding: 10px 20px;
+    background: var(--orange);
+    color: var(--contrast-color);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-family: var(--font-content);
+}
+
+.btn-store a {
+    text-decoration: none;
+}
+
+.btn-store:hover {
+    background-color: rgb(228, 136, 89);
 }
 
 .container-video {
