@@ -113,8 +113,7 @@ func HandleProcessPayment(c *gin.Context, db *sql.DB){
 		c.String(http.StatusInternalServerError, "Error al cargar el carrito")
 		return
 	}
-
-	// Validar stock antes de continuar
+	
 	for _, item := range cartItems {
 		var stock int
 		err := db.QueryRow("SELECT quantity FROM products WHERE id = ?", item.ProductID).Scan(&stock)
@@ -201,46 +200,54 @@ func HandlePayUConfirmation(c *gin.Context, db *sql.DB){
 }
 
 func HandleOpenSuccess(c *gin.Context, db *sql.DB) {
-	referenceCode := c.Query("referenceCode")
+    referenceCode := c.Query("referenceCode")
 
-	if referenceCode == "" {
-		view.Render(c, http.StatusBadRequest, "payment_failed.html", gin.H{
-			"title": "Transacción inválida",
-			"Message": "No se pudo verificar la transacción.",
-		})
-		return
-	}
+    if referenceCode == "" {
+        view.Render(c, http.StatusBadRequest, "payment_failed.html", gin.H{
+            "title":   "Transacción inválida",
+            "Message": "No se pudo verificar la transacción.",
+        })
+        return
+    }
 
-	var status string
-	err := db.QueryRow("SELECT status FROM transactions WHERE reference_code = ?", referenceCode).Scan(&status)
-	if err != nil {
-		view.Render(c, http.StatusInternalServerError, "payment_failed.html", gin.H{
-			"title": "Error",
-			"Message": "No se pudo validar el estado de tu transacción.",
-		})
-		return
-	}
+    var status string
+    err := db.QueryRow(`SELECT status FROM transactions WHERE reference_code = ?`, referenceCode).Scan(&status)
+    if err != nil {
+        view.Render(c, http.StatusInternalServerError, "payment_failed.html", gin.H{
+            "title":   "Error",
+            "Message": "No se pudo validar el estado de tu transacción.",
+        })
+        return
+    }
 
-	switch status {
-	case "completed":
-		session := sessions.Default(c)
-		session.Delete("cart_session_id")
-		session.Save()
-		flash.SetMessage(c, "¡Gracias por tu compra! Tu pago fue aprobado.", "success")
-		view.Render(c, http.StatusOK, "success.html", gin.H{
-			"title": "Pago exitoso",
-		})
+    switch status {
+    case "completed":
 
-	case "needs_refund":
-		view.Render(c, http.StatusOK, "refund_pending.html", gin.H{
-			"title": "Reembolso en proceso",
-			"Message": "Tu pago fue recibido, pero el producto ya no está disponible. Hemos iniciado un reembolso automático. Te llegará un correo.",
-		})
+        session := sessions.Default(c)
+        session.Delete("cart_session_id")
+        session.Save()
 
-	default:
-		view.Render(c, http.StatusOK, "payment_failed.html", gin.H{
-			"title": "Pago no exitoso",
-			"Message": "Tu pago no fue aprobado o ocurrió un problema. Intenta de nuevo.",
-		})
-	}
+        flash.SetMessage(c, "¡Gracias por tu compra! Tu pago fue aprobado.", "success")
+        view.Render(c, http.StatusOK, "success.html", gin.H{
+            "title": "Pago exitoso",
+        })
+
+    case "needs_refund":
+        view.Render(c, http.StatusOK, "refund_pending.html", gin.H{
+            "title":   "Reembolso en proceso",
+            "Message": "Tu pago fue recibido, pero el producto ya no está disponible. " + "Hemos iniciado un reembolso automático. Te llegará un correo.",
+        })
+
+    case "refunded":
+        view.Render(c, http.StatusOK, "refund_completed.html", gin.H{
+            "title":   "Reembolso completado",
+            "Message": "Tu pago fue reembolsado automáticamente. " + "Revisa tu correo para más información.",
+        })
+
+    default:
+        view.Render(c, http.StatusOK, "payment_failed.html", gin.H{
+            "title":   "Pago no exitoso",
+            "Message": "Tu pago no fue aprobado o ocurrió un problema. Intenta de nuevo.",
+        })
+    }
 }

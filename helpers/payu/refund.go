@@ -45,70 +45,87 @@ func RefundTransactionWithLog(db *sql.DB, transactionID int, payuTransactionID s
         message = err.Error()
     }
 
+    // Log de intento
     _, logErr := db.Exec(`
         INSERT INTO refund_attempts (transaction_id, payu_transaction_id, status, message)
         VALUES (?, ?, ?, ?)`,
         transactionID, payuTransactionID, status, message,
     )
     if logErr != nil {
-        fmt.Printf("Failed to log refund attempt: %v\n", logErr)
+        fmt.Printf("[Tx:%d] Failed to log refund attempt: %v\n", transactionID, logErr)
     }
 
+    // 🔹 Si falla el reembolso
     if status == "fail" {
-        fmt.Printf("Refund failed: %s\n", message)
+        fmt.Printf("[Tx:%d] Refund failed: %s\n", transactionID, message)
 
         var email, fullName string
-        _ = db.QueryRow(`
+        if err := db.QueryRow(`
             SELECT email, full_name FROM shipping_info WHERE transaction_id = ?`,
-            transactionID).Scan(&email, &fullName)
+            transactionID).Scan(&email, &fullName); err != nil {
+            fmt.Printf("[Tx:%d] Could not fetch email for refund failure: %v\n", transactionID, err)
+            return
+        }
 
         if email != "" {
             go func() {
                 if err := auth.SendRefundFailureEmail(email, fullName); err != nil {
-                    fmt.Printf("Failed to send refund failure email: %v\n", err)
+                    fmt.Printf("[Tx:%d] Failed to send refund failure email: %v\n", transactionID, err)
                 } else {
-                    fmt.Println("Refund failure email sent")
+                    fmt.Printf("[Tx:%d] Refund failure email sent\n", transactionID)
                 }
             }()
         }
         return
     }
 
+    // 🔹 Si el reembolso fue exitoso
+    _, updateErr := db.Exec(`UPDATE transactions SET status = 'refunded' WHERE id = ?`, transactionID)
+    if updateErr != nil {
+        fmt.Printf("[Tx:%d] Failed to mark transaction as refunded: %v\n", transactionID, updateErr)
+    }
+
+    // Obtener datos de cliente
     var email, fullName string
-    var productSummary string
-
-    _ = db.QueryRow(`
+    if err := db.QueryRow(`
         SELECT email, full_name FROM shipping_info WHERE transaction_id = ?`, transactionID).
-        Scan(&email, &fullName)
+        Scan(&email, &fullName); err != nil {
+        fmt.Printf("[Tx:%d] Could not fetch email for refund confirmation: %v\n", transactionID, err)
+        return
+    }
 
+    // Resumen de productos
+    var productSummary string
     rows, err := db.Query(`
         SELECT p.name, ti.quantity
         FROM transaction_items ti
         JOIN products p ON p.id = ti.product_id
         WHERE ti.transaction_id = ?`, transactionID)
     if err == nil {
+        defer rows.Close()
         var summary string
         for rows.Next() {
             var name string
             var qty int
-            _ = rows.Scan(&name, &qty)
-            summary += fmt.Sprintf("%s x%d, ", name, qty)
-        }
-        productSummary = summary
-        rows.Close()
-    }
-
-    go func() {
-        if email != "" {
-            if err := auth.SendRefundEmail(email, fullName, productSummary); err != nil {
-                fmt.Printf("Failed to send refund email: %v\n", err)
-            } else {
-                fmt.Println("Refund email sent successfully")
+            if err := rows.Scan(&name, &qty); err == nil {
+                summary += fmt.Sprintf("%s x%d, ", name, qty)
             }
         }
-    }()
+        productSummary = summary
+    }
 
-    fmt.Println("Refund triggered successfully")
+    // Envío de correo en segundo plano
+    if email != "" {
+        go func() {
+            if err := auth.SendRefundEmail(email, fullName, productSummary); err != nil {
+                fmt.Printf("[Tx:%d] Failed to send refund email: %v\n", transactionID, err)
+            } else {
+                fmt.Printf("[Tx:%d] Refund email sent successfully\n", transactionID)
+            }
+        }()
+    }
+
+    fmt.Printf("[Tx:%d] Refund triggered successfully and transaction marked as refunded\n", transactionID)
 }
 
 func RefundTransaction(payuTransactionID string) error {
