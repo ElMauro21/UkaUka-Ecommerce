@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 )
 
 type StatusRequest struct {
@@ -67,6 +68,9 @@ func CheckPendingTransactions(db *sql.DB) {
 					fmt.Printf("Unknown state for transaction %d: %s\n", id, state)
 				}
 			}
+			rows.Close()
+
+			time.Sleep(5 * time.Minute)
 		}
 	}()
 }
