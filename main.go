@@ -58,6 +58,7 @@ func main() {
 
   jobs.JobTokenCleanup(db)
   jobs.JobGuestCartCleanup(db)
+  jobs.CheckPendingTransactions(db)
 
   admin.CreateAdminUser(db)
 
