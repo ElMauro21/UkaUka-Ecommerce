@@ -170,7 +170,106 @@
         </select>
       </div>
     </form>
-    <div class="admin-orders">Hola</div>
+    <div class="admin-orders">
+      <form class="transaction-form" id="transaction-form">
+        <h2 class="form-title">Selecciona una Transacción</h2>
+        <select id="transaction-selector" onchange="fillTransactionForm(this)">
+          <option value="">-- Selecciona una transacción --</option>
+          {{range .transactions}}
+          <option
+            value="{{.ID}}"
+            data-reference-code="{{.ReferenceCode}}"
+            data-total-amount="{{.TotalAmount}}"
+            data-created-at="{{.CreatedAt}}"
+            data-user-name="{{.UserName}}"
+            data-user-surname="{{.UserSurname}}"
+            data-shipping-name="{{.Shipping.FullName}}"
+            data-shipping-id="{{.Shipping.IDNumber}}"
+            data-shipping-phone="{{.Shipping.Phone}}"
+            data-shipping-email="{{.Shipping.Email}}"
+            data-shipping-address="{{.Shipping.Address}}, {{.Shipping.Neighborhood}}, {{.Shipping.City}}, {{.Shipping.State}}"
+            data-products="{{.ProductDetails}}"
+          >
+            <!-- Correctly pass ProductDetails -->
+            {{.ReferenceCode}} | {{.UserName}} {{.UserSurname}} |
+            ${{.TotalAmount}} | Fecha: {{.CreatedAt}}
+          </option>
+          {{end}}
+        </select>
+
+        <!-- Detalles de la transacción -->
+        <div class="transaction-details">
+          <h3>Detalles de la Transacción</h3>
+          <div>
+            <strong>Código de referencia:</strong>
+            <input type="text" id="reference-code" readonly />
+          </div>
+          <div>
+            <strong>Monto Total:</strong> $<input
+              type="text"
+              id="total-amount"
+              readonly
+            />
+          </div>
+          <div>
+            <strong>Fecha de Creación:</strong>
+            <input type="text" id="created-at" readonly />
+          </div>
+          <div>
+            <strong>Cliente:</strong>
+            <input type="text" id="user-name" readonly />
+            <input type="text" id="user-surname" readonly />
+          </div>
+        </div>
+
+        <!-- Información de envío -->
+        <div class="shipping-info">
+          <h3>Información de Envío</h3>
+          <div>
+            <strong>Nombre completo:</strong>
+            <input type="text" id="shipping-name" readonly />
+          </div>
+          <div>
+            <strong>ID:</strong> <input type="text" id="shipping-id" readonly />
+          </div>
+          <div>
+            <strong>Teléfono:</strong>
+            <input type="text" id="shipping-phone" readonly />
+          </div>
+          <div>
+            <strong>Email:</strong>
+            <input type="text" id="shipping-email" readonly />
+          </div>
+          <div>
+            <strong>Dirección:</strong>
+            <input type="text" id="shipping-address" readonly />
+          </div>
+        </div>
+
+        <!-- Productos comprados -->
+        <div class="products-info">
+          <h3>Productos Comprados</h3>
+          <ul id="products-list"></ul>
+        </div>
+
+        <!-- Campo para ingresar código de rastreo -->
+        <div class="tracking-info">
+          <h3>Ingresar código de rastreo</h3>
+          <input
+            type="text"
+            id="tracking-code"
+            placeholder="Código de rastreo"
+          />
+          <button
+            type="button"
+            id="update-shipped"
+            onclick="updateShippedStatus()"
+          >
+            Actualizar Estado
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </main>
 {{ template "footer" . }}

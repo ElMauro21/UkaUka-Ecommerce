@@ -323,3 +323,56 @@ function soundActivator() {
     video.muted = false;
     video.play();
 }
+
+function fillTransactionForm(select) {
+    const option = select.options[select.selectedIndex];
+
+    if (!option.value) {
+        document.getElementById('transaction-form').reset();
+        return;
+    }
+
+    document.getElementById('reference-code').value =
+        option.dataset.referenceCode;
+    document.getElementById('total-amount').value = option.dataset.totalAmount;
+    document.getElementById('created-at').value = option.dataset.createdAt;
+    document.getElementById('user-name').value = option.dataset.userName;
+    document.getElementById('user-surname').value = option.dataset.userSurname;
+
+    document.getElementById('shipping-name').value =
+        option.dataset.shippingName;
+    document.getElementById('shipping-id').value = option.dataset.shippingId;
+    document.getElementById('shipping-phone').value =
+        option.dataset.shippingPhone;
+    document.getElementById('shipping-email').value =
+        option.dataset.shippingEmail;
+    document.getElementById('shipping-address').value =
+        option.dataset.shippingAddress;
+
+    const productsStr = option.dataset.products;
+
+    const products = productsStr.split(',').map(product => {
+        const parts = product.trim().split(' ');
+
+        const name = parts.slice(0, -2).join(' ');
+        const quantity = parseInt(
+            parts[parts.length - 2].replace('(', '').replace(')', '')
+        );
+        const price = parseFloat(parts[parts.length - 1].replace('$', ''));
+
+        return {
+            Name: name,
+            Quantity: quantity,
+            Price: price,
+        };
+    });
+
+    const productsList = document.getElementById('products-list');
+    productsList.innerHTML = '';
+
+    products.forEach(product => {
+        const li = document.createElement('li');
+        li.textContent = `${product.Name} | Cantidad: ${product.Quantity} | Precio: $${product.Price}`;
+        productsList.appendChild(li);
+    });
+}

@@ -441,7 +441,8 @@ header {
     height: 100%;
     box-sizing: border-box;
     padding: 1rem;
-    background-color: blue;
+    background-color: var(--background-forms);
+    color: var(--contrast-color);
 }
 
 .item {
