@@ -1,0 +1,55 @@
+{{ define "modal" }}
+<div id="modal-wrapper" style="display: none">
+  <div class="modal-overlay">
+    <form
+      id="modal-container"
+      class="modal-container"
+      action="/cart/add"
+      method="post"
+    >
+      <img
+        class="modal-decoration"
+        src="/static/images/modal-decoration.png"
+        alt="modal-decoration"
+      />
+      <input type="hidden" name="product-id" />
+      <div class="modal-image">
+        <img />
+      </div>
+      <div class="modal-name">
+        <h1></h1>
+      </div>
+      <div class="modal-description">
+        Descripción:
+        <p></p>
+      </div>
+      <div class="modal-quantity">
+        Cantidad:
+        <div class="quantity-control">
+          <button type="button" class="qty-btn" id="qty-decrease">
+            <i class="fa-solid fa-minus"></i>
+          </button>
+          <span id="qty-display">1</span>
+          <input type="hidden" name="quantity" id="quantity-hidden" value="" />
+          <button type="button" class="qty-btn" id="qty-increase">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+        </div>
+        <p>Stock disponible: <span id="stock-available">0</span></p>
+      </div>
+      <div class="modal-price">
+        Precio:
+        <p></p>
+      </div>
+      <div class="modal-button">
+        <button>Añadir al carrito</button>
+      </div>
+      <div class="modal-close">
+        <button type="button" id="close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{{ end }}

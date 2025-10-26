@@ -1,0 +1,30 @@
+{{ template "base" .}}
+<main>
+  <h1 class="page-title">Carrito de compras</h1>
+  <div class="cart-section">
+    <div class="cart-container">
+      {{ if .items }}
+      <div class="cart-header-product">Producto</div>
+      <div class="cart-header-quantity">Cantidad</div>
+      <div class="cart-header-price">Precio unitario</div>
+      <div class="cart-header-subtotal">Subtotal</div>
+      {{end}}
+    </div>
+    {{ range .items }} {{ template "cart_item" . }} {{ else }}
+    <div class="empty-cart">
+      <img src="/static/images/empty-cart.png" alt="empty-cart" />
+    </div>
+    {{ end }} {{ if .items }}
+    <div id="cart-total">
+      <form action="/checkout" method="post">
+        <input type="hidden" name="total" value="{{ .Total }}" />
+        <input type="hidden" name="description" value="{{ .Description }}" />
+        <strong>Total:</strong>
+        <span class="price" data-raw="{{ .Total }}">{{ .Total }}</span>
+        <button class="checkout-button" type="submit">Pagar</button>
+      </form>
+    </div>
+    {{ end }}
+  </div>
+</main>
+{{ template "footer" .}}

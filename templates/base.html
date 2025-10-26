@@ -1,0 +1,142 @@
+{{ define "base"}}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <link rel="stylesheet" href="/static/style.css" />
+    <meta charset="utf-8" />
+    <title>{{ .title }}</title>
+    <meta name="robots" content="index" />
+    <!--Responsive-->
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <!--50-160 letters-->
+    <meta
+      name="description"
+      content="UkaUka fabrica de obstaculos para
+    fingerboard"
+    />
+    <!--Icons-->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-pVIyEk3h6Jxj...YOUR_INTEGRITY_HASH..."
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <!--Fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Concert+One&display=swap"
+      rel="stylesheet"
+    />
+    <!--SweetAlert2-->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!--HTMX-->
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <!--Js files-->
+    <script src="/static/helpers.js" defer></script>
+    <script src="/static/alerts.js" defer></script>
+    <script src="/static/script.js" defer></script>
+  </head>
+  <body>
+    <!-- ===== Header ===== -->
+    <header>
+      <div class="header-container-logo-title">
+        <button class="header-logo" onclick="window.location.href='/'">
+          <img src="/static/images/logo.png" alt="logo" width="70px" />
+        </button>
+        <h1 class="header-title">UkaUka<sup>fb</sup></h1>
+      </div>
+      <nav class="header-nav">
+        {{ if and .loggedIn .isAdmin }}
+        <button
+          class="header-nav-button"
+          onclick="window.location.href='/admin/dashboard'"
+        >
+          <i class="fa-solid fa-hammer"></i>
+        </button>
+        {{ end }}
+        <button
+          class="header-nav-button"
+          onclick="window.location.href='/shop'"
+        >
+          <i class="fa-solid fa-shop"></i>
+        </button>
+        <button
+          class="header-nav-button"
+          onclick="window.location.href='/cart'"
+        >
+          <i class="fa-solid fa-cart-shopping"></i>
+        </button>
+        {{ if .loggedIn }}
+        <button class="header-nav-button" id="toggleMenuBtn">
+          <div class="icon-wrapper">
+            <i class="fa-solid fa-check login-status"></i>
+            <i class="fa-solid fa-user"></i>
+          </div>
+        </button>
+        {{ else }}
+        <button
+          class="header-nav-button"
+          onclick="window.location.href='/auth/login'"
+        >
+          <div class="icon-wrapper">
+            <i class="fa-solid fa-user"></i>
+          </div>
+        </button>
+        {{ end }}
+        <div class="sub-menu-wrap" id="subMenu">
+          <div class="sub-menu">
+            <div class="user-name"><h3>{{ .user}}</h3></div>
+            <hr />
+
+            <a href="/user/profile" class="sub-menu-link">
+              <i class="fa-solid fa-address-card"></i>
+              <p>Editar perfil</p>
+              <span>></span>
+            </a>
+            <form action="/auth/logout" method="post">
+              <button type="submit" class="sub-menu-link">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <p>Cerrar sesión</p>
+                <span>></span>
+              </button>
+            </form>
+          </div>
+        </div>
+        <!--Dropdown button-->
+        <div class="dropdown">
+          <button class="header-nav-button" id="menu-toggle">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="dropdown-content" id="dropdown-content">
+            <a href="/">Página de inicio</a>
+            <a href="/shop">Tienda</a>
+            <a href="/cart">Carrito de compras</a>
+            {{if .loggedIn}}
+            <form action="/auth/logout" method="post">
+              <button type="submit" class="logout-menu">
+                <a>Cierra sesión</a>
+              </button>
+            </form>
+            {{else}}
+            <a href="/auth/login">Inicia sesión</a>
+            {{end}}
+            <a href="/about">Acerca de UkaUka</a>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!--Alerts-->
+    <div
+      id="flash"
+      data-message="{{.Message}}"
+      data-type="{{.MessageType}}"
+    ></div>
+    {{ block "content" . }}{{ end }}
+    <!-- ===== Footer ===== -->
+  </body>
+</html>
+{{end}}

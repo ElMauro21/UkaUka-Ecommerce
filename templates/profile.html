@@ -1,0 +1,219 @@
+{{ template "base" .}}
+<main>
+  <!-- ===== Profile form ===== -->
+  <div class="content">
+    <div class="form-box">
+      <div class="profile-container" id="profile">
+        <div class="top">
+          <span>
+            Quieres cambiar tu contraseña?
+            <a href="#" onclick="change()">Cambiar contraseña</a></span
+          >
+          <h2 class="form-title">Información personal</h2>
+        </div>
+        <form hx-post="/user/update" hx-target="#flash" hx-swap="outerHTML">
+          <div class="two-column-grid">
+            <!--Name-->
+            <div class="input-box">
+              <input
+                name="name"
+                type="text"
+                class="input-field"
+                placeholder="Nombres"
+                required
+                value="{{ .User.Names}}"
+              />
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <!--Surname-->
+            <div class="input-box">
+              <input
+                name="surname"
+                type="text"
+                class="input-field"
+                placeholder="Apellidos"
+                required
+                value="{{ .User.Surnames }}"
+              />
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <!--Id-->
+            <div class="input-box">
+              <input
+                name="id-number"
+                type="text"
+                class="input-field"
+                placeholder="Documento"
+                value="{{ .User.IDNumber }}"
+              />
+              <i class="fa-solid fa-id-card"></i>
+            </div>
+            <!--Phone-->
+            <div class="input-box">
+              <input
+                name="phone"
+                type="text"
+                class="input-field"
+                placeholder="Teléfono"
+                value="{{ .User.Phone }}"
+              />
+              <i class="fa-solid fa-phone"></i>
+            </div>
+            <!--State-->
+            <div class="input-box">
+              <input
+                name="state"
+                type="text"
+                class="input-field"
+                placeholder="Departamento"
+                value="{{ .User.State }}"
+              />
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <!--City-->
+            <div class="input-box">
+              <input
+                name="city"
+                type="text"
+                class="input-field"
+                placeholder="Ciudad"
+                value="{{ .User.City }}"
+              />
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <!--Neighborhood-->
+            <div class="input-box">
+              <input
+                name="neighborhood"
+                type="text"
+                class="input-field"
+                placeholder="Barrio"
+                value="{{ .User.Neighborhood }}"
+              />
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <!--Address-->
+            <div class="input-box">
+              <input
+                name="address"
+                type="text"
+                class="input-field"
+                placeholder="Dirección"
+                value="{{ .User.Address }}"
+              />
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+          </div>
+          <div class="input-box">
+            <input
+              type="submit"
+              class="submit"
+              value="Actualiza tus datos"
+              required
+            />
+          </div>
+        </form>
+        {{ if not .isAdmin }}
+        <div class="bottom">
+          <span>
+            Quieres borrar tu cuenta?
+            <a href="#" onclick="eliminate()"> Eliminar cuenta</a></span
+          >
+          <p>
+            No olvides las ventajas de tener cuenta:<br />
+            <br />
+            1. Guarda tus datos para futuras compras <br />
+            2. Revisa tus órdenes y sigue tus envios
+          </p>
+        </div>
+        {{ end }}
+      </div>
+      <!-- ===== Passwords form ===== -->
+      <div class="passwords-container" id="passwords">
+        <div class="top">
+          <span>
+            Quieres cambiar tus datos personales?
+            <a href="#" onclick="profile()">Datos personales</a></span
+          >
+          <h2 class="form-title">Cambia tu contraseña</h2>
+        </div>
+        <form hx-post="/user/password" hx-target="#flash" hx-swap="outerHTML">
+          <!--Passwords-->
+          <!-- Current password -->
+          <div class="input-box">
+            <input
+              name="current-password"
+              type="password"
+              class="input-field"
+              placeholder="Contraseña actual"
+              required
+            />
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div class="input-box">
+            <input
+              name="reg-password1"
+              type="password"
+              minlength="8"
+              class="input-field"
+              placeholder="Contraseña (8 o más caracteres)"
+              required
+            />
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div class="input-box">
+            <input
+              name="reg-password2"
+              type="password"
+              minlength="8"
+              class="input-field"
+              placeholder="Repite la contraseña"
+              required
+            />
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div class="input-box">
+            <input
+              type="submit"
+              class="submit"
+              value="Cambiar contraseña"
+              required
+            />
+          </div>
+        </form>
+      </div>
+      <!-- ===== Delete account form ===== -->
+      <div class="eliminate-account-container" id="eliminate">
+        <div class="top">
+          <span>
+            Quieres cambiar tus datos personales?
+            <a href="#" onclick="profile()">Datos personales</a></span
+          >
+          <h2 class="form-title">Elimina tu cuenta</h2>
+        </div>
+        <form hx-post="/user/eliminate" hx-target="#flash" hx-swap="outerHTML">
+          <!-- Current password -->
+          <div class="input-box">
+            <input
+              name="current-password"
+              type="password"
+              class="input-field"
+              placeholder="Contraseña actual"
+              required
+            />
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div class="input-box">
+            <input
+              type="submit"
+              class="submit"
+              value="Eliminar cuenta"
+              required
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+{{ template "footer" . }}

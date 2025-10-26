@@ -1,0 +1,70 @@
+{{ define "payu_form.html" }}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirigiendo a PayU...</title>
+  </head>
+  <body onload="document.forms[0].submit()">
+    <h3>Redirigiendo a la pasarela de pago...</h3>
+    <form method="post" action="{{.PayUFormURL}}">
+      <!-- Datos del comercio -->
+      <input type="hidden" name="merchantId" value="{{ .MerchantID }}" />
+      <input type="hidden" name="accountId" value="{{ .AccountID }}" />
+      <input type="hidden" name="description" value="{{ .Description }}" />
+      <input type="hidden" name="referenceCode" value="{{ .ReferenceCode }}" />
+      <input type="hidden" name="amount" value="{{ .Amount }}" />
+      <input type="hidden" name="tax" value="{{ .Tax }}" />
+      <input type="hidden" name="taxReturnBase" value="{{ .TaxReturnBase }}" />
+      <input type="hidden" name="currency" value="{{ .Currency }}" />
+      <input type="hidden" name="signature" value="{{ .Signature }}" />
+      <input type="hidden" name="test" value="{{ .Test }}" />
+
+      <!-- Información del comprador -->
+      <input type="hidden" name="buyerEmail" value="{{ .BuyerEmail }}" />
+      <input type="hidden" name="buyerFullName" value="{{ .BuyerFullName }}" />
+      <input
+        type="hidden"
+        name="buyerDocumentType"
+        value="{{ .BuyerDocumentType }}"
+      />
+      <input type="hidden" name="buyerDocument" value="{{ .BuyerDocument }}" />
+      <input type="hidden" name="telephone" value="{{ .Telephone }}" />
+
+      <!-- Información del pagador (obligatoria aunque sea la misma) -->
+      <input type="hidden" name="payerEmail" value="{{ .BuyerEmail }}" />
+      <input type="hidden" name="payerFullName" value="{{ .BuyerFullName }}" />
+      <input
+        type="hidden"
+        name="payerDocumentType"
+        value="{{ .BuyerDocumentType }}"
+      />
+      <input type="hidden" name="payerDocument" value="{{ .BuyerDocument }}" />
+      <input type="hidden" name="payerPhone" value="{{ .Telephone }}" />
+
+      <!-- Información de envío -->
+      <input
+        type="hidden"
+        name="shippingAddress"
+        value="{{ .ShippingAddress }}"
+      />
+      <input type="hidden" name="shippingCity" value="{{ .ShippingCity }}" />
+      <input
+        type="hidden"
+        name="shippingCountry"
+        value="{{ .ShippingCountry }}"
+      />
+
+      <!-- URLs de respuesta -->
+      <input type="hidden" name="responseUrl" value="{{ .ResponseURL }}" />
+      <input
+        type="hidden"
+        name="confirmationUrl"
+        value="{{ .ConfirmationURL }}"
+      />
+
+      <input type="submit" value="Pagar ahora" />
+    </form>
+  </body>
+</html>
+{{ end }}

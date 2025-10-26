@@ -1,0 +1,275 @@
+{{ template "base" .}}
+<main>
+  <div class="dashboard-container">
+    <form class="admin-products" id="admin-products">
+      <input type="hidden" name="product-id" />
+      <div class="item dashboard-products-title">
+        <div class="top">
+          <h2 class="form-title">Productos</h2>
+        </div>
+      </div>
+      <div class="item">
+        <!--Name-->
+        <div>
+          <input
+            name="product-name"
+            type="text"
+            class="input-field-dash"
+            placeholder="Nombre"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Description-->
+        <div>
+          <textarea
+            name="product-description"
+            type="text"
+            class="input-field-dash text-area"
+            placeholder="Descripción"
+            rows="6"
+            required
+          ></textarea>
+        </div>
+      </div>
+      <div class="item">
+        <!--Weight-->
+        <div>
+          <input
+            name="product-weight"
+            type="number"
+            class="input-field-dash"
+            placeholder="Peso (gramos)"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Size-->
+        <div>
+          <input
+            name="product-size"
+            type="number"
+            class="input-field-dash"
+            placeholder="Tamaño (cm3)"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Image-->
+        <div>
+          <input
+            name="product-image"
+            type="url"
+            class="input-field-dash"
+            placeholder="Url imagen"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Image-->
+        <div>
+          <input
+            name="product-image-two"
+            type="url"
+            class="input-field-dash"
+            placeholder="Url imagen 2"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Price-->
+        <div>
+          <input
+            name="product-price"
+            type="number"
+            class="input-field-dash"
+            placeholder="Precio"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Quantity-->
+        <div>
+          <input
+            name="product-quantity"
+            type="number"
+            class="input-field-dash"
+            placeholder="Cantidad"
+            required
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Buttton Delete-->
+        <div>
+          <input
+            type="submit"
+            class="submit submit-dash"
+            value="Eliminar"
+            required
+            hx-post="/admin/products/delete"
+            hx-target="#flash"
+            hx-swap="outerHTML"
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Buttton Update -->
+        <div>
+          <input
+            type="submit"
+            class="submit submit-dash"
+            value="Actualizar"
+            required
+            hx-post="/admin/products/update"
+            hx-target="#flash"
+            hx-swap="outerHTML"
+          />
+        </div>
+      </div>
+      <div class="item">
+        <!--Buttton Add-->
+        <div>
+          <input
+            id="add-button"
+            type="submit"
+            class="submit submit-dash"
+            value="Añadir"
+            required
+            hx-post="/admin/products/add"
+            hx-target="#flash"
+            hx-swap="outerHTML"
+          />
+        </div>
+      </div>
+      <div class="item dashboard-products-finder">
+        <select id="product-selector" onchange="fillProductForm(this)">
+          <option value="">-- Selecciona un producto --</option>
+          {{range .products}}
+          <option
+            value="{{.ID}}"
+            data-name="{{.Name}}"
+            data-description="{{.Description}}"
+            data-weight="{{.Weight}}"
+            data-size="{{.Size}}"
+            data-price="{{.Price}}"
+            data-quantity="{{.Quantity}}"
+            data-image="{{.Image}}"
+            data-image2="{{.Image2}}"
+          >
+            {{.Name}} | Peso: {{.Weight}} | Tamaño: {{.Size}} | ${{.Price}} |
+            Stock: {{.Quantity}}
+          </option>
+          {{end}}
+        </select>
+      </div>
+    </form>
+    <div class="admin-orders">
+      <form class="transaction-form" id="transaction-form">
+        <h2 class="form-title">Selecciona una Transacción</h2>
+        <select id="transaction-selector" onchange="fillTransactionForm(this)">
+          <option value="">-- Selecciona una transacción --</option>
+          {{range .transactions}}
+          <option
+            value="{{.ID}}"
+            data-reference-code="{{.ReferenceCode}}"
+            data-total-amount="{{.TotalAmount}}"
+            data-created-at="{{.CreatedAt}}"
+            data-user-name="{{.UserName}}"
+            data-user-surname="{{.UserSurname}}"
+            data-shipping-name="{{.Shipping.FullName}}"
+            data-shipping-id="{{.Shipping.IDNumber}}"
+            data-shipping-phone="{{.Shipping.Phone}}"
+            data-shipping-email="{{.Shipping.Email}}"
+            data-shipping-address="{{.Shipping.Address}}, {{.Shipping.Neighborhood}}, {{.Shipping.City}}, {{.Shipping.State}}"
+            data-products="{{.ProductDetails}}"
+          >
+            <!-- Correctly pass ProductDetails -->
+            {{.ReferenceCode}} | {{.UserName}} {{.UserSurname}} |
+            ${{.TotalAmount}} | Fecha: {{.CreatedAt}}
+          </option>
+          {{end}}
+        </select>
+
+        <!-- Detalles de la transacción -->
+        <div class="transaction-details">
+          <h3>Detalles de la Transacción</h3>
+          <div>
+            <strong>Código de referencia:</strong>
+            <input type="text" id="reference-code" readonly />
+          </div>
+          <div>
+            <strong>Monto Total:</strong> $<input
+              type="text"
+              id="total-amount"
+              readonly
+            />
+          </div>
+          <div>
+            <strong>Fecha de Creación:</strong>
+            <input type="text" id="created-at" readonly />
+          </div>
+          <div>
+            <strong>Cliente:</strong>
+            <input type="text" id="user-name" readonly />
+            <input type="text" id="user-surname" readonly />
+          </div>
+        </div>
+
+        <!-- Información de envío -->
+        <div class="shipping-info">
+          <h3>Información de Envío</h3>
+          <div>
+            <strong>Nombre completo:</strong>
+            <input type="text" id="shipping-name" readonly />
+          </div>
+          <div>
+            <strong>ID:</strong> <input type="text" id="shipping-id" readonly />
+          </div>
+          <div>
+            <strong>Teléfono:</strong>
+            <input type="text" id="shipping-phone" readonly />
+          </div>
+          <div>
+            <strong>Email:</strong>
+            <input type="text" id="shipping-email" readonly />
+          </div>
+          <div>
+            <strong>Dirección:</strong>
+            <input type="text" id="shipping-address" readonly />
+          </div>
+        </div>
+
+        <!-- Productos comprados -->
+        <div class="products-info">
+          <h3>Productos Comprados</h3>
+          <ul id="products-list"></ul>
+        </div>
+
+        <!-- Campo para ingresar código de rastreo -->
+        <div class="tracking-info">
+          <h3>Ingresar código de rastreo</h3>
+          <input
+            type="text"
+            id="tracking-code"
+            placeholder="Código de rastreo"
+          />
+          <button
+            type="button"
+            id="update-shipped"
+            onclick="updateShippedStatus()"
+          >
+            Actualizar Estado
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+{{ template "footer" . }}
